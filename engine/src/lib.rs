@@ -1,15 +1,17 @@
-use crate::cards::{Deck};
+use crate::cards::Deck;
 
 mod cards;
 mod game;
 
 pub fn testme() {
-    // let mut deck = Deck::new();
-    // println!("{:?}", deck);
+    let mut deck = Deck::new();
+    // // println!("{:?}", deck);
     //
-    // deck.shuffle();
+    deck.shuffle();
     // println!("{:?}", deck);
 
-    let game = game::Game{};
+    println!("{}", deck.draw_card().unwrap());
+
+    let game = game::Game {};
     println!("{}", game)
 }
