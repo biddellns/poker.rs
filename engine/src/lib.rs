@@ -1,5 +1,12 @@
+use crate::cards::{Deck};
+
+mod cards;
+
 pub fn testme() {
-    println!("hiya")
+    let deck = Deck::new();
+
+    println!("{:?}", deck)
+
 }
 #[cfg(test)]
 mod tests {
