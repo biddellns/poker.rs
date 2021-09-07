@@ -1,4 +1,6 @@
 use strum::{EnumIter, IntoEnumIterator};
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 
 #[derive(Debug)]
 pub struct Deck {
@@ -18,6 +20,15 @@ impl Deck {
         Deck {
             cards
         }
+    }
+
+    pub fn shuffle(&mut self) {
+        let mut rng = thread_rng();
+        self.cards.shuffle(&mut rng)
+    }
+
+    pub fn draw_card(&mut self) -> Option<Card> {
+        self.cards.pop()
     }
 }
 
@@ -59,5 +70,14 @@ mod tests {
     #[test]
     fn deck_holds_52_cards() {
         assert_eq!(Deck::new().cards.len(), 52)
+    }
+
+    #[test]
+    fn deck_hold_one_less_after_drawing() {
+        let mut deck = Deck::new();
+        let original_len = deck.cards.len();
+
+        deck.draw_card();
+        assert_eq!(deck.cards.len(), original_len - 1)
     }
 }
