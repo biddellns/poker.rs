@@ -15,9 +15,9 @@ use std::marker::PhantomData;
 use crate::cards::Deck;
 use crate::table::Player;
 
-struct TexasHoldemHand<'a, 'b, S: State> {
+struct TexasHoldemHand<'a, S: State> {
     deck: Deck,
-    players: &'a [Player<'a, 'b>],
+    players: &'a [Player<'a>],
     // state: S,
     marker: std::marker::PhantomData<S>,
 }
@@ -44,8 +44,8 @@ impl State for Shuffled {}
 
 impl State for DealtToPlayers {}
 
-impl<'a, 'b> TexasHoldemHand<'a, 'b, Start> {
-    pub fn new(players: &'a [Player<'_, 'b>]) -> TexasHoldemHand<'a, 'b, Start> {
+impl<'a> TexasHoldemHand<'a, Start> {
+    pub fn new(players: &'a [Player]) -> TexasHoldemHand<'a, Start> {
         TexasHoldemHand {
             deck: Deck::new(),
             players,
@@ -53,7 +53,7 @@ impl<'a, 'b> TexasHoldemHand<'a, 'b, Start> {
         }
     }
 
-    fn shuffle(&mut self) -> TexasHoldemHand<'a, 'b, Shuffled> {
+    fn shuffle(&mut self) -> TexasHoldemHand<'a, Shuffled> {
         self.deck.shuffle();
 
         TexasHoldemHand {
@@ -64,8 +64,8 @@ impl<'a, 'b> TexasHoldemHand<'a, 'b, Start> {
     }
 }
 
-impl<'a, 'b> TexasHoldemHand<'a, 'b, Shuffled> {
-    fn deal_to_players(&mut self) -> TexasHoldemHand<'a, 'b, DealtToPlayers> {
+impl<'a, 'b> TexasHoldemHand<'a, Shuffled> {
+    fn deal_to_players(&mut self) -> TexasHoldemHand<'a, DealtToPlayers> {
         for i in 0..2 {
             for j in 0..5 {
                 match self.deck.draw_card() {

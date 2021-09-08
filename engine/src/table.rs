@@ -3,12 +3,12 @@ use crate::table::Errors::PlayerLimitExceeded;
 use std::fmt::{Display, Formatter};
 
 #[derive(Eq, PartialEq, Debug)]
-pub struct Table<'a, 'b> {
-    players: Vec<&'a Player<'a, 'b>>,
+pub struct Table<'a> {
+    players: Vec<&'a Player<'a>>,
     player_limit: usize,
 }
 
-impl<'a, 'b> Table<'a, 'b> {
+impl<'a> Table<'a> {
     pub fn new() -> Self {
         Table {
             players: Vec::new(),
@@ -16,7 +16,7 @@ impl<'a, 'b> Table<'a, 'b> {
         }
     }
 
-    pub fn add_player(&mut self, player: &'a Player<'a, 'b>) -> Result<(), Errors> {
+    pub fn add_player(&mut self, player: &'a Player<'a>) -> Result<(), Errors> {
         if self.players.len() >= self.player_limit {
             return Err(PlayerLimitExceeded);
         }
@@ -30,7 +30,7 @@ impl<'a, 'b> Table<'a, 'b> {
     }
 }
 
-impl<'a, 'b> Display for Table<'a, 'b> {
+impl<'a> Display for Table<'a> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let line1 = " -------------------------------------";
         let line2 = "/                                      \\";
@@ -48,18 +48,18 @@ impl<'a, 'b> Display for Table<'a, 'b> {
 }
 
 #[derive(Eq, PartialEq, Debug)]
-pub struct Player<'a, 'b> {
+pub struct Player<'a> {
     name: &'a str,
-    cards: &'b [Card],
+    cards: Vec<Card>,
 }
 
-impl<'a, 'b> Player<'a, 'b> {
+impl<'a, 'b> Player<'a> {
     fn new(name: &'a str) -> Self {
-        Player { name, cards: &[] }
+        Player { name, cards: Vec::new() }
     }
 }
 
-impl<'a, 'b> Display for Player<'a, 'b> {
+impl<'a, 'b> Display for Player<'a> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.name)
     }
@@ -87,16 +87,16 @@ mod tests {
     fn player_can_be_assigned_cards() {
         let mut player = Player::new("Nic");
 
-        let expected_cards = &[Card {
+        let expected_cards = vec![Card {
             rank: Rank::Ace,
             suit: Suit::Heart,
         }];
 
-        player.cards = expected_cards;
+        player.cards = expected_cards.clone();
 
         assert_eq!(expected_cards, player.cards);
 
-        let expected_cards = &[
+        let expected_cards = vec![
             Card {
                 rank: Rank::Ace,
                 suit: Suit::Heart,
@@ -107,7 +107,7 @@ mod tests {
             },
         ];
 
-        player.cards = expected_cards;
+        player.cards = expected_cards.clone();
 
         assert_eq!(expected_cards, player.cards);
     }
