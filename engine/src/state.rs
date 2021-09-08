@@ -14,10 +14,11 @@ use std::marker::PhantomData;
 
 use crate::cards::Deck;
 use crate::table::Player;
+use crate::state::Errors::NotEnoughCardsToDeal;
 
 struct TexasHoldemHand<'a, S: State> {
     deck: Deck,
-    players: &'a [Player<'a>],
+    players: &'a mut [Player<'a>],
     // state: S,
     marker: std::marker::PhantomData<S>,
 }
@@ -45,7 +46,7 @@ impl State for Shuffled {}
 impl State for DealtToPlayers {}
 
 impl<'a> TexasHoldemHand<'a, Start> {
-    pub fn new(players: &'a [Player]) -> TexasHoldemHand<'a, Start> {
+    pub fn new(players: &'a mut [Player<'a>]) -> TexasHoldemHand<'a, Start> {
         TexasHoldemHand {
             deck: Deck::new(),
             players,
@@ -53,7 +54,7 @@ impl<'a> TexasHoldemHand<'a, Start> {
         }
     }
 
-    fn shuffle(&mut self) -> TexasHoldemHand<'a, Shuffled> {
+    fn shuffle(&'a mut self) -> TexasHoldemHand<'a, Shuffled> {
         self.deck.shuffle();
 
         TexasHoldemHand {
@@ -64,22 +65,31 @@ impl<'a> TexasHoldemHand<'a, Start> {
     }
 }
 
-impl<'a, 'b> TexasHoldemHand<'a, Shuffled> {
-    fn deal_to_players(&mut self) -> TexasHoldemHand<'a, DealtToPlayers> {
-        for i in 0..2 {
-            for j in 0..5 {
+impl<'a> TexasHoldemHand<'a, Shuffled> {
+    fn deal_to_players(&'a mut self) -> Result<TexasHoldemHand<'a, DealtToPlayers>, Errors> {
+        // let mut players_a = self.players.clone_from_slice(self.players);
+        // for _ in 0..2 {
+        //     for player in players {
+        //         match self.deck.draw_card() {
+        //             Some(c) => player.receive_card(c),
+        //             None => return Err(NotEnoughCardsToDeal)
+        //         }
+        //     }
+        // }
+        for _ in 0..2 {
+            for player in self.players.to_vec().iter_mut() {
                 match self.deck.draw_card() {
-                    Some(c) => todo!(), // player(i).card.push(c)
-                    None => todo!()
+                    Some(c) => player.receive_card(c),
+                    None => return Err(NotEnoughCardsToDeal)
                 }
             }
         }
 
-        TexasHoldemHand {
+        Ok(TexasHoldemHand {
             deck: self.deck.clone(),
             players: self.players,
             marker: PhantomData::<DealtToPlayers>
-        }
+        })
     }
 }
 
@@ -90,6 +100,12 @@ trait Bet {
     fn fold();
 }
 
+#[derive(Debug, Eq, PartialEq)]
+pub enum Errors {
+    NotEnoughCardsToDeal,
+}
+
+
 #[cfg(test)]
 mod tests {
     use crate::state::{TexasHoldemHand, Shuffled};
@@ -97,7 +113,7 @@ mod tests {
 
     #[test]
     fn initial_typestate_only_allows_one_shuffle() {
-        let mut hand = TexasHoldemHand::new(&[]).shuffle().deal_to_players();
+        let hand = TexasHoldemHand::new(&mut []).shuffle().deal_to_players();
         //not a great test, but need to check into testing type IDs
     }
 }

@@ -47,15 +47,19 @@ impl<'a> Display for Table<'a> {
     }
 }
 
-#[derive(Eq, PartialEq, Debug)]
+#[derive(Eq, PartialEq, Debug, Clone)]
 pub struct Player<'a> {
     name: &'a str,
     cards: Vec<Card>,
 }
 
-impl<'a, 'b> Player<'a> {
+impl<'a> Player<'a> {
     fn new(name: &'a str) -> Self {
         Player { name, cards: Vec::new() }
+    }
+
+    pub(crate) fn receive_card(&mut self, card: Card) {
+        self.cards.push(card);
     }
 }
 
@@ -74,6 +78,7 @@ pub enum Errors {
 mod tests {
     use crate::cards::{Card, Rank, Suit};
     use crate::table::{Errors, Player, Table};
+    use crate::cards::Suit::Heart;
 
     #[test]
     fn player_display_prints_name() {
@@ -150,5 +155,17 @@ mod tests {
         table.set_player_limit(expected_player_limit);
 
         assert_eq!(expected_player_limit, table.player_limit)
+    }
+
+    #[test]
+    fn player_receives_dealt_cards() {
+        let mut player = Player::new("Nic");
+        assert!(player.cards.is_empty());
+
+        let expected_card = Card { rank: Rank::King, suit: Suit::Club};
+        player.receive_card(expected_card);
+
+        assert!(player.cards.contains(&expected_card))
+
     }
 }
