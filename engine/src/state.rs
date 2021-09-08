@@ -67,17 +67,10 @@ impl<'a> TexasHoldemHand<'a, Start> {
 
 impl<'a> TexasHoldemHand<'a, Shuffled> {
     fn deal_to_players(&'a mut self) -> Result<TexasHoldemHand<'a, DealtToPlayers>, Errors> {
-        // let mut players_a = self.players.clone_from_slice(self.players);
-        // for _ in 0..2 {
-        //     for player in players {
-        //         match self.deck.draw_card() {
-        //             Some(c) => player.receive_card(c),
-        //             None => return Err(NotEnoughCardsToDeal)
-        //         }
-        //     }
-        // }
+
+        // Every player gets two cards
         for _ in 0..2 {
-            for player in self.players.to_vec().iter_mut() {
+            for player in self.players.iter_mut() {
                 match self.deck.draw_card() {
                     Some(c) => player.receive_card(c),
                     None => return Err(NotEnoughCardsToDeal)
