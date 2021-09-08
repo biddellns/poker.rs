@@ -3,14 +3,12 @@ use std::fmt::{Display, Formatter};
 
 #[derive(Eq, PartialEq, Debug)]
 pub struct Game<'a, 'b> {
-    players: &'a[Player<'a, 'b>]
+    players: &'a [Player<'a, 'b>],
 }
 
 impl<'a, 'b> Game<'a, 'b> {
     pub fn new() -> Self {
-        Game {
-            players: &[]
-        }
+        Game { players: &[] }
     }
 }
 
@@ -66,16 +64,16 @@ mod tests {
     fn player_can_be_assigned_cards() {
         let mut player = Player::new("Nic");
 
-        let expectedCards = &[Card {
+        let expected_cards = &[Card {
             rank: Rank::Ace,
             suit: Suit::Heart,
         }];
 
-        player.cards = expectedCards;
+        player.cards = expected_cards;
 
-        assert_eq!(expectedCards, player.cards);
+        assert_eq!(expected_cards, player.cards);
 
-        let expectedCards = &[
+        let expected_cards = &[
             Card {
                 rank: Rank::Ace,
                 suit: Suit::Heart,
@@ -86,9 +84,9 @@ mod tests {
             },
         ];
 
-        player.cards = expectedCards;
+        player.cards = expected_cards;
 
-        assert_eq!(expectedCards, player.cards);
+        assert_eq!(expected_cards, player.cards);
     }
 
     #[test]
