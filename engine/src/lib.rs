@@ -1,8 +1,8 @@
 use crate::cards::Deck;
 
 mod cards;
-mod table;
 mod state;
+mod table;
 
 pub fn testme() {
     let mut deck = Deck::new();

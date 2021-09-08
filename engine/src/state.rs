@@ -10,27 +10,37 @@
 // 9. Eval cards for winner
 //10. DONE
 
-use crate::cards::Deck;
 use std::marker::PhantomData;
 
-struct TexasHoldemHand<S: State> {
+use crate::cards::Deck;
 
+struct TexasHoldemHand<S: State> {
     deck: Deck,
+
     // state: S,
-    marker: std::marker::PhantomData<S>
+    marker: std::marker::PhantomData<S>,
 }
 
 struct Start {}
+
 struct Shuffled {}
+
 struct DealtToPlayers {}
+
 struct DealtFlop {}
+
 struct DealtRiver {}
+
 struct DealTurn {}
+
 struct EvalWinner {}
 
 trait State {}
+
 impl State for Start {}
+
 impl State for Shuffled {}
+
 impl State for DealtToPlayers {}
 
 impl TexasHoldemHand<Start> {
@@ -45,13 +55,24 @@ impl TexasHoldemHand<Start> {
         self.deck.shuffle();
 
         TexasHoldemHand {
-            deck: self.deck,
-            marker: PhantomData::<Shuffled>
+            deck: self.deck.clone(),
+            marker: PhantomData::<Shuffled>,
         }
     }
 }
 
-
+impl TexasHoldemHand<Shuffled> {
+    fn deal_to_players(&mut self) {
+        for i in 0..2 {
+            for j in 0..5 {
+                match self.deck.draw_card() {
+                    Some(c) => todo!(), // player(i).card.push(c)
+                    None => todo!()
+                }
+            }
+        }
+    }
+}
 
 trait Bet {
     fn raise(amount: u8);
@@ -65,10 +86,8 @@ mod tests {
     use crate::state::TexasHoldemHand;
 
     #[test]
-    fn typestate_stuff() {
+    fn initial_typestate_only_allows_one_shuffle() {
         let hand = TexasHoldemHand::new().shuffle();
-        hand.shuffle();
-        hand.shuffle();
-
+        // Not a great test atm. Without reflection, can't really test this?
     }
 }
