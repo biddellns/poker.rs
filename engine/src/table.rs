@@ -24,6 +24,10 @@ impl<'a, 'b> Table<'a, 'b> {
         self.players.push(player);
         Ok(())
     }
+
+    pub fn set_player_limit(&mut self, limit: usize) {
+        self.player_limit = limit
+    }
 }
 
 impl<'a, 'b> Display for Table<'a, 'b> {
@@ -120,7 +124,7 @@ mod tests {
         let expected_player = Player::new("Nic");
 
         let mut table = Table::new();
-        table.add_player(&expected_player);
+        let _ = table.add_player(&expected_player);
 
         assert!(table.players.contains(&&expected_player))
     }
@@ -136,5 +140,15 @@ mod tests {
         let result = table.add_player(&expected_player);
 
         assert_eq!(result.unwrap_err(), Errors::PlayerLimitExceeded)
+    }
+
+    #[test]
+    fn can_set_tables_player_limit() {
+        let mut table = Table::new();
+
+        let expected_player_limit = 5;
+        table.set_player_limit(expected_player_limit);
+
+        assert_eq!(expected_player_limit, table.player_limit)
     }
 }
