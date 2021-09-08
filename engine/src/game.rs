@@ -8,11 +8,13 @@ pub struct Game<'a, 'b> {
 
 impl<'a, 'b> Game<'a, 'b> {
     pub fn new() -> Self {
-        Game { players: Vec::new() }
+        Game {
+            players: Vec::new(),
+        }
     }
 
     pub fn add_player(&mut self, player: &'a Player<'a, 'b>) {
-        self.players.push(&player)
+        self.players.push(player)
     }
 }
 
@@ -95,7 +97,9 @@ mod tests {
 
     #[test]
     fn can_create_new_game_with_defaults() {
-        let expected_game = Game { players: Vec::new() };
+        let expected_game = Game {
+            players: Vec::new(),
+        };
 
         assert_eq!(expected_game, Game::new())
     }
