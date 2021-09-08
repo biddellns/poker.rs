@@ -20,9 +20,18 @@ impl Display for Game {
     }
 }
 
-pub struct Player<'a> {
+struct Player<'a> {
     name: &'a str,
-    cards: [Card],
+    cards: Vec<Card>,
+}
+
+impl<'a> Player<'a> {
+    fn new(name: &'a str) -> Self {
+        Player {
+            name,
+            cards: Vec::new()
+        }
+    }
 }
 
 impl<'a> Display for Player<'a> {
@@ -33,5 +42,24 @@ impl<'a> Display for Player<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::game::Game;
+    use crate::game::{Game, Player};
+    use crate::cards::{Card, Rank, Suit};
+
+    #[test]
+    fn player_display_prints_name() {
+        let expected_name = "Nic";
+        let player = Player::new(expected_name);
+
+        assert_eq!(expected_name, format!("{}", player))
+    }
+
+    #[test]
+    fn player_can_be_assigned_cards() {
+        let mut player = Player::new("Nic");
+
+        let expectedCards = vec![Card {rank: Rank::Ace, suit: Suit::Heart}];
+        player.cards = expectedCards.clone();
+
+        assert_eq!(expectedCards, player.cards)
+    }
 }

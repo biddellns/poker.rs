@@ -32,7 +32,7 @@ impl Deck {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub struct Card {
     pub(crate) rank: Rank,
     pub(crate) suit: Suit,
@@ -44,7 +44,7 @@ impl Display for Card {
     }
 }
 
-#[derive(Copy, Clone, Debug, EnumIter)]
+#[derive(Copy, Clone, Debug, EnumIter, Eq, PartialEq)]
 pub enum Rank {
     Two,
     Three,
@@ -81,7 +81,7 @@ impl Display for Rank {
     }
 }
 
-#[derive(Copy, Clone, Debug, EnumIter)]
+#[derive(Copy, Clone, Debug, EnumIter, Eq, PartialEq)]
 pub enum Suit {
     Heart,
     Diamond,
