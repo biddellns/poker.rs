@@ -1,20 +1,28 @@
 use crate::cards::Card;
+use crate::table::Errors::PlayerLimitExceeded;
 use std::fmt::{Display, Formatter};
 
 #[derive(Eq, PartialEq, Debug)]
 pub struct Table<'a, 'b> {
     players: Vec<&'a Player<'a, 'b>>,
+    player_limit: usize,
 }
 
 impl<'a, 'b> Table<'a, 'b> {
     pub fn new() -> Self {
         Table {
             players: Vec::new(),
+            player_limit: 10,
         }
     }
 
-    pub fn add_player(&mut self, player: &'a Player<'a, 'b>) {
-        self.players.push(player)
+    pub fn add_player(&mut self, player: &'a Player<'a, 'b>) -> Result<(), Errors> {
+        if self.players.len() >= self.player_limit {
+            return Err(PlayerLimitExceeded);
+        }
+
+        self.players.push(player);
+        Ok(())
     }
 }
 
@@ -53,10 +61,15 @@ impl<'a, 'b> Display for Player<'a, 'b> {
     }
 }
 
+#[derive(Debug, Eq, PartialEq)]
+pub enum Errors {
+    PlayerLimitExceeded,
+}
+
 #[cfg(test)]
 mod tests {
     use crate::cards::{Card, Rank, Suit};
-    use crate::table::{Table, Player};
+    use crate::table::{Errors, Player, Table};
 
     #[test]
     fn player_display_prints_name() {
@@ -97,20 +110,31 @@ mod tests {
 
     #[test]
     fn can_create_new_game_with_defaults() {
-        let expected_game = Table {
-            players: Vec::new(),
-        };
+        let expected_table = Table::new();
 
-        assert_eq!(expected_game, Table::new())
+        assert_eq!(expected_table, Table::new())
     }
 
     #[test]
     fn can_add_new_player_to_game() {
         let expected_player = Player::new("Nic");
 
-        let mut game = Table::new();
-        game.add_player(&expected_player);
+        let mut table = Table::new();
+        table.add_player(&expected_player);
 
-        assert!(game.players.contains(&&expected_player))
+        assert!(table.players.contains(&&expected_player))
+    }
+
+    #[test]
+    fn returns_err_when_adding_player_past_table_capacity() {
+        let expected_player = Player::new("Nic");
+
+        let mut table = Table::new();
+
+        table.player_limit = 0;
+
+        let result = table.add_player(&expected_player);
+
+        assert_eq!(result.unwrap_err(), Errors::PlayerLimitExceeded)
     }
 }
