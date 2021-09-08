@@ -12,6 +12,6 @@ pub fn testme() {
 
     println!("{}", deck.draw_card().unwrap());
 
-    let game = game::Game {};
+    let game = game::Game::new();
     println!("{}", game)
 }

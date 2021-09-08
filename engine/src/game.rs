@@ -1,9 +1,20 @@
 use crate::cards::Card;
 use std::fmt::{Display, Formatter};
 
-pub struct Game {}
+#[derive(Eq, PartialEq, Debug)]
+pub struct Game<'a, 'b> {
+    players: &'a[Player<'a, 'b>]
+}
 
-impl Display for Game {
+impl<'a, 'b> Game<'a, 'b> {
+    pub fn new() -> Self {
+        Game {
+            players: &[]
+        }
+    }
+}
+
+impl<'a, 'b> Display for Game<'a, 'b> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let line1 = " -------------------------------------";
         let line2 = "/                                      \\";
@@ -20,6 +31,7 @@ impl Display for Game {
     }
 }
 
+#[derive(Eq, PartialEq, Debug)]
 struct Player<'a, 'b> {
     name: &'a str,
     cards: &'b [Card],
@@ -77,5 +89,12 @@ mod tests {
         player.cards = expectedCards;
 
         assert_eq!(expectedCards, player.cards);
+    }
+
+    #[test]
+    fn can_create_new_game_with_defaults() {
+        let expected_game = Game { players: &[] };
+
+        assert_eq!(expected_game, Game::new())
     }
 }
