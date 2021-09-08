@@ -105,7 +105,9 @@ mod tests {
 
     #[test]
     fn initial_typestate_only_allows_one_shuffle() {
-        let hand = TexasHoldemHand::new(&mut []).shuffle().deal_to_players();
+        let players = &mut [];
+        let mut hand = TexasHoldemHand::new(players).shuffle();
+        let hand = hand.deal_to_players().unwrap();
         //not a great test, but need to check into testing type IDs
     }
 }
