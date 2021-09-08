@@ -13,10 +13,11 @@
 use std::marker::PhantomData;
 
 use crate::cards::Deck;
+use crate::table::Player;
 
-struct TexasHoldemHand<S: State> {
+struct TexasHoldemHand<'a, 'b, S: State> {
     deck: Deck,
-
+    players: &'a [Player<'a, 'b>],
     // state: S,
     marker: std::marker::PhantomData<S>,
 }
@@ -43,26 +44,28 @@ impl State for Shuffled {}
 
 impl State for DealtToPlayers {}
 
-impl TexasHoldemHand<Start> {
-    fn new() -> TexasHoldemHand<Start> {
+impl<'a, 'b> TexasHoldemHand<'a, 'b, Start> {
+    pub fn new(players: &'a [Player<'_, 'b>]) -> TexasHoldemHand<'a, 'b, Start> {
         TexasHoldemHand {
             deck: Deck::new(),
+            players,
             marker: PhantomData::<Start>,
         }
     }
 
-    fn shuffle(&mut self) -> TexasHoldemHand<Shuffled> {
+    fn shuffle(&mut self) -> TexasHoldemHand<'a, 'b, Shuffled> {
         self.deck.shuffle();
 
         TexasHoldemHand {
             deck: self.deck.clone(),
+            players: self.players,
             marker: PhantomData::<Shuffled>,
         }
     }
 }
 
-impl TexasHoldemHand<Shuffled> {
-    fn deal_to_players(&mut self) {
+impl<'a, 'b> TexasHoldemHand<'a, 'b, Shuffled> {
+    fn deal_to_players(&mut self) -> TexasHoldemHand<'a, 'b, DealtToPlayers> {
         for i in 0..2 {
             for j in 0..5 {
                 match self.deck.draw_card() {
@@ -70,6 +73,12 @@ impl TexasHoldemHand<Shuffled> {
                     None => todo!()
                 }
             }
+        }
+
+        TexasHoldemHand {
+            deck: self.deck.clone(),
+            players: self.players,
+            marker: PhantomData::<DealtToPlayers>
         }
     }
 }
@@ -83,11 +92,12 @@ trait Bet {
 
 #[cfg(test)]
 mod tests {
-    use crate::state::TexasHoldemHand;
+    use crate::state::{TexasHoldemHand, Shuffled};
+    use std::any::Any;
 
     #[test]
     fn initial_typestate_only_allows_one_shuffle() {
-        let hand = TexasHoldemHand::new().shuffle();
-        // Not a great test atm. Without reflection, can't really test this?
+        let mut hand = TexasHoldemHand::new(&[]).shuffle().deal_to_players();
+        //not a great test, but need to check into testing type IDs
     }
 }
