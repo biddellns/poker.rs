@@ -1,7 +1,7 @@
 use crate::cards::Deck;
 
 mod cards;
-mod game;
+mod table;
 
 pub fn testme() {
     let mut deck = Deck::new();
@@ -12,6 +12,6 @@ pub fn testme() {
 
     println!("{}", deck.draw_card().unwrap());
 
-    let game = game::Game::new();
+    let game = table::Table::new();
     println!("{}", game)
 }

@@ -2,13 +2,13 @@ use crate::cards::Card;
 use std::fmt::{Display, Formatter};
 
 #[derive(Eq, PartialEq, Debug)]
-pub struct Game<'a, 'b> {
+pub struct Table<'a, 'b> {
     players: Vec<&'a Player<'a, 'b>>,
 }
 
-impl<'a, 'b> Game<'a, 'b> {
+impl<'a, 'b> Table<'a, 'b> {
     pub fn new() -> Self {
-        Game {
+        Table {
             players: Vec::new(),
         }
     }
@@ -18,7 +18,7 @@ impl<'a, 'b> Game<'a, 'b> {
     }
 }
 
-impl<'a, 'b> Display for Game<'a, 'b> {
+impl<'a, 'b> Display for Table<'a, 'b> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let line1 = " -------------------------------------";
         let line2 = "/                                      \\";
@@ -56,7 +56,7 @@ impl<'a, 'b> Display for Player<'a, 'b> {
 #[cfg(test)]
 mod tests {
     use crate::cards::{Card, Rank, Suit};
-    use crate::game::{Game, Player};
+    use crate::table::{Table, Player};
 
     #[test]
     fn player_display_prints_name() {
@@ -97,18 +97,18 @@ mod tests {
 
     #[test]
     fn can_create_new_game_with_defaults() {
-        let expected_game = Game {
+        let expected_game = Table {
             players: Vec::new(),
         };
 
-        assert_eq!(expected_game, Game::new())
+        assert_eq!(expected_game, Table::new())
     }
 
     #[test]
     fn can_add_new_player_to_game() {
         let expected_player = Player::new("Nic");
 
-        let mut game = Game::new();
+        let mut game = Table::new();
         game.add_player(&expected_player);
 
         assert!(game.players.contains(&&expected_player))
