@@ -3,12 +3,16 @@ use std::fmt::{Display, Formatter};
 
 #[derive(Eq, PartialEq, Debug)]
 pub struct Game<'a, 'b> {
-    players: &'a [Player<'a, 'b>],
+    players: Vec<&'a Player<'a, 'b>>,
 }
 
 impl<'a, 'b> Game<'a, 'b> {
     pub fn new() -> Self {
-        Game { players: &[] }
+        Game { players: Vec::new() }
+    }
+
+    pub fn add_player(&mut self, player: &'a Player<'a, 'b>) {
+        self.players.push(&player)
     }
 }
 
@@ -30,7 +34,7 @@ impl<'a, 'b> Display for Game<'a, 'b> {
 }
 
 #[derive(Eq, PartialEq, Debug)]
-struct Player<'a, 'b> {
+pub struct Player<'a, 'b> {
     name: &'a str,
     cards: &'b [Card],
 }
@@ -91,8 +95,18 @@ mod tests {
 
     #[test]
     fn can_create_new_game_with_defaults() {
-        let expected_game = Game { players: &[] };
+        let expected_game = Game { players: Vec::new() };
 
         assert_eq!(expected_game, Game::new())
+    }
+
+    #[test]
+    fn can_add_new_player_to_game() {
+        let expected_player = Player::new("Nic");
+
+        let mut game = Game::new();
+        game.add_player(&expected_player);
+
+        assert!(game.players.contains(&&expected_player))
     }
 }
