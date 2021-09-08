@@ -54,8 +54,11 @@ pub struct Player<'a> {
 }
 
 impl<'a> Player<'a> {
-    fn new(name: &'a str) -> Self {
-        Player { name, cards: Vec::new() }
+    pub(crate) fn new(name: &'a str) -> Self {
+        Player {
+            name,
+            cards: Vec::new(),
+        }
     }
 
     pub(crate) fn receive_card(&mut self, card: Card) {
@@ -76,9 +79,9 @@ pub enum Errors {
 
 #[cfg(test)]
 mod tests {
+    use crate::cards::Suit::Heart;
     use crate::cards::{Card, Rank, Suit};
     use crate::table::{Errors, Player, Table};
-    use crate::cards::Suit::Heart;
 
     #[test]
     fn player_display_prints_name() {
@@ -162,10 +165,12 @@ mod tests {
         let mut player = Player::new("Nic");
         assert!(player.cards.is_empty());
 
-        let expected_card = Card { rank: Rank::King, suit: Suit::Club};
+        let expected_card = Card {
+            rank: Rank::King,
+            suit: Suit::Club,
+        };
         player.receive_card(expected_card);
 
         assert!(player.cards.contains(&expected_card))
-
     }
 }

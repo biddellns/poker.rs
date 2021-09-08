@@ -13,8 +13,10 @@
 use std::marker::PhantomData;
 
 use crate::cards::Deck;
-use crate::table::Player;
 use crate::state::Errors::NotEnoughCardsToDeal;
+use crate::table::Player;
+
+const CARDS_PER_PLAYER: u32 = 2;
 
 struct TexasHoldemHand<'a, S: State> {
     deck: Deck,
@@ -67,13 +69,11 @@ impl<'a> TexasHoldemHand<'a, Start> {
 
 impl<'a> TexasHoldemHand<'a, Shuffled> {
     fn deal_to_players(&'a mut self) -> Result<TexasHoldemHand<'a, DealtToPlayers>, Errors> {
-
-        // Every player gets two cards
-        for _ in 0..2 {
+        for _ in 0..CARDS_PER_PLAYER {
             for player in self.players.iter_mut() {
                 match self.deck.draw_card() {
                     Some(c) => player.receive_card(c),
-                    None => return Err(NotEnoughCardsToDeal)
+                    None => return Err(NotEnoughCardsToDeal),
                 }
             }
         }
@@ -81,7 +81,7 @@ impl<'a> TexasHoldemHand<'a, Shuffled> {
         Ok(TexasHoldemHand {
             deck: self.deck.clone(),
             players: self.players,
-            marker: PhantomData::<DealtToPlayers>
+            marker: PhantomData::<DealtToPlayers>,
         })
     }
 }
@@ -98,11 +98,10 @@ pub enum Errors {
     NotEnoughCardsToDeal,
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::state::{TexasHoldemHand, Shuffled};
-    use std::any::Any;
+    use crate::state::{Shuffled, Start, TexasHoldemHand, CARDS_PER_PLAYER};
+    use crate::table::Player;
 
     #[test]
     fn initial_typestate_only_allows_one_shuffle() {
