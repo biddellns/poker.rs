@@ -20,21 +20,18 @@ impl Display for Game {
     }
 }
 
-struct Player<'a> {
+struct Player<'a, 'b> {
     name: &'a str,
-    cards: Vec<Card>,
+    cards: &'b [Card],
 }
 
-impl<'a> Player<'a> {
+impl<'a, 'b> Player<'a, 'b> {
     fn new(name: &'a str) -> Self {
-        Player {
-            name,
-            cards: Vec::new()
-        }
+        Player { name, cards: &[] }
     }
 }
 
-impl<'a> Display for Player<'a> {
+impl<'a, 'b> Display for Player<'a, 'b> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.name)
     }
@@ -42,8 +39,8 @@ impl<'a> Display for Player<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::game::{Game, Player};
     use crate::cards::{Card, Rank, Suit};
+    use crate::game::{Game, Player};
 
     #[test]
     fn player_display_prints_name() {
@@ -57,9 +54,28 @@ mod tests {
     fn player_can_be_assigned_cards() {
         let mut player = Player::new("Nic");
 
-        let expectedCards = vec![Card {rank: Rank::Ace, suit: Suit::Heart}];
-        player.cards = expectedCards.clone();
+        let expectedCards = &[Card {
+            rank: Rank::Ace,
+            suit: Suit::Heart,
+        }];
 
-        assert_eq!(expectedCards, player.cards)
+        player.cards = expectedCards;
+
+        assert_eq!(expectedCards, player.cards);
+
+        let expectedCards = &[
+            Card {
+                rank: Rank::Ace,
+                suit: Suit::Heart,
+            },
+            Card {
+                rank: Rank::King,
+                suit: Suit::Club,
+            },
+        ];
+
+        player.cards = expectedCards;
+
+        assert_eq!(expectedCards, player.cards);
     }
 }
