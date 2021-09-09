@@ -18,9 +18,9 @@ use crate::table::Player;
 
 const CARDS_PER_PLAYER: u32 = 2;
 
-struct TexasHoldemHand<'a, S: State> {
+struct TexasHoldemHand<'a, 'b, S: State> {
     deck: Deck,
-    players: &'a mut [Player<'a>],
+    players: &'a mut [Player<'b>],
     // state: S,
     marker: std::marker::PhantomData<S>,
 }
@@ -47,8 +47,8 @@ impl State for Shuffled {}
 
 impl State for DealtToPlayers {}
 
-impl<'a> TexasHoldemHand<'a, Start> {
-    pub fn new(players: &'a mut [Player<'a>]) -> TexasHoldemHand<'a, Start> {
+impl<'a, 'b> TexasHoldemHand<'a, 'b, Start> {
+    pub fn new(players: &'a mut [Player<'b>]) -> TexasHoldemHand<'a, 'b, Start> {
         TexasHoldemHand {
             deck: Deck::new(),
             players,
@@ -56,7 +56,7 @@ impl<'a> TexasHoldemHand<'a, Start> {
         }
     }
 
-    fn shuffle(&'a mut self) -> TexasHoldemHand<'a, Shuffled> {
+    fn shuffle(&mut self) -> TexasHoldemHand<'a, 'b, Shuffled> {
         self.deck.shuffle();
 
         TexasHoldemHand {
@@ -67,8 +67,8 @@ impl<'a> TexasHoldemHand<'a, Start> {
     }
 }
 
-impl<'a> TexasHoldemHand<'a, Shuffled> {
-    fn deal_to_players(&'a mut self) -> Result<TexasHoldemHand<'a, DealtToPlayers>, Errors> {
+impl<'a, 'b> TexasHoldemHand<'a, 'b, Shuffled> {
+    fn deal_to_players(&mut self) -> Result<TexasHoldemHand<'a, 'b, DealtToPlayers>, Errors> {
         for _ in 0..CARDS_PER_PLAYER {
             for player in self.players.iter_mut() {
                 match self.deck.draw_card() {
@@ -105,8 +105,9 @@ mod tests {
 
     #[test]
     fn initial_typestate_only_allows_one_shuffle() {
-        let players = &mut [];
-        let mut hand = TexasHoldemHand::new(players).shuffle();
+        let mut players: &[Player] = &[Player::new("halp")];
+
+        let mut hand = TexasHoldemHand::new(&mut players).shuffle();
         let hand = hand.deal_to_players().unwrap();
         //not a great test, but need to check into testing type IDs
     }
