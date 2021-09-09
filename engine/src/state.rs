@@ -56,7 +56,7 @@ impl<'a, 'b> TexasHoldemHand<'a, 'b, Start> {
         }
     }
 
-    fn shuffle(&mut self) -> TexasHoldemHand<'a, 'b, Shuffled> {
+    fn shuffle(mut self) -> TexasHoldemHand<'a, 'b, Shuffled> {
         self.deck.shuffle();
 
         TexasHoldemHand {
@@ -68,7 +68,7 @@ impl<'a, 'b> TexasHoldemHand<'a, 'b, Start> {
 }
 
 impl<'a, 'b> TexasHoldemHand<'a, 'b, Shuffled> {
-    fn deal_to_players(&mut self) -> Result<TexasHoldemHand<'a, 'b, DealtToPlayers>, Errors> {
+    fn deal_to_players(mut self) -> Result<TexasHoldemHand<'a, 'b, DealtToPlayers>, Errors> {
         for _ in 0..CARDS_PER_PLAYER {
             for player in self.players.iter_mut() {
                 match self.deck.draw_card() {
@@ -107,7 +107,7 @@ mod tests {
     fn initial_typestate_only_allows_one_shuffle() {
         let mut players: &[Player] = &[Player::new("halp")];
 
-        let mut hand = TexasHoldemHand::new(&mut players).shuffle();
+        let mut hand = TexasHoldemHand::new(&mut []).shuffle();
         let hand = hand.deal_to_players().unwrap();
         //not a great test, but need to check into testing type IDs
     }
