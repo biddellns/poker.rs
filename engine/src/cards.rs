@@ -44,6 +44,28 @@ impl Display for Card {
     }
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Cards(pub(crate) Vec<Card>);
+
+impl Cards {
+    fn push(&mut self, card: Card) {
+        self.0.push(card)
+    }
+
+    fn len(&self) -> usize {
+        self.0.len()
+    }
+}
+impl Display for Cards {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let cards = self
+            .0
+            .iter()
+            .fold(String::new(), |mut acc, card| acc + &format!(", {}", card));
+        write!(f, "{}", cards)
+    }
+}
+
 #[derive(Copy, Clone, Debug, EnumIter, Eq, PartialEq)]
 pub enum Rank {
     Two,

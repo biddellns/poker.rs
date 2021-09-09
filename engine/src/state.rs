@@ -100,15 +100,16 @@ pub enum Errors {
 
 #[cfg(test)]
 mod tests {
+    use std::ops::DerefMut;
+
     use crate::state::{Shuffled, Start, TexasHoldemHand, CARDS_PER_PLAYER};
     use crate::table::Player;
-    use std::ops::DerefMut;
 
     #[test]
     fn initial_typestate_only_allows_one_shuffle() {
-        let mut players: &[Player] = &[Player::new("halp")];
+        let players: &[Player] = &[Player::new("halp")];
 
-        let mut hand = TexasHoldemHand::new(&mut []).shuffle();
+        let hand = TexasHoldemHand::new(&mut []).shuffle();
         let hand = hand.deal_to_players().unwrap();
         //not a great test, but need to check into testing type IDs
     }
@@ -118,9 +119,11 @@ mod tests {
         let mut players = vec![Player::new("Player1"), Player::new("Player2")];
 
         let mut hand = TexasHoldemHand::new(players.deref_mut());
-        let mut hand = hand.shuffle();
-        let mut hand = hand.deal_to_players();
+        let hand = hand.shuffle();
+        let hand = hand.deal_to_players();
 
-        players.iter().for_each(|p| assert_eq!(p.get_num_cards(), CARDS_PER_PLAYER))
+        players
+            .iter()
+            .for_each(|p| assert_eq!(p.get_num_cards(), CARDS_PER_PLAYER))
     }
 }

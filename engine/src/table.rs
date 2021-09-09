@@ -1,4 +1,4 @@
-use crate::cards::Card;
+use crate::cards::{Card, Cards};
 use crate::table::Errors::PlayerLimitExceeded;
 use std::fmt::{Display, Formatter};
 
@@ -50,23 +50,23 @@ impl<'a> Display for Table<'a> {
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub struct Player<'a> {
     name: &'a str,
-    cards: Vec<Card>,
+    cards: Cards,
 }
 
 impl<'a> Player<'a> {
     pub(crate) fn new(name: &'a str) -> Self {
         Player {
             name,
-            cards: Vec::new(),
+            cards: Cards(Vec::new()),
         }
     }
 
     pub(crate) fn receive_card(&mut self, card: Card) {
-        self.cards.push(card);
+        self.cards.0.push(card);
     }
 
     pub fn get_num_cards(&self) -> usize {
-        self.cards.len()
+        self.cards.0.len()
     }
 }
 
@@ -84,7 +84,7 @@ pub enum Errors {
 #[cfg(test)]
 mod tests {
     use crate::cards::Suit::Heart;
-    use crate::cards::{Card, Rank, Suit};
+    use crate::cards::{Card, Cards, Rank, Suit};
     use crate::table::{Errors, Player, Table};
 
     #[test]
@@ -99,16 +99,16 @@ mod tests {
     fn player_can_be_assigned_cards() {
         let mut player = Player::new("Nic");
 
-        let expected_cards = vec![Card {
+        let expected_cards = Cards(vec![Card {
             rank: Rank::Ace,
             suit: Suit::Heart,
-        }];
+        }]);
 
         player.cards = expected_cards.clone();
 
         assert_eq!(expected_cards, player.cards);
 
-        let expected_cards = vec![
+        let expected_cards = Cards(vec![
             Card {
                 rank: Rank::Ace,
                 suit: Suit::Heart,
@@ -117,7 +117,7 @@ mod tests {
                 rank: Rank::King,
                 suit: Suit::Club,
             },
-        ];
+        ]);
 
         player.cards = expected_cards.clone();
 
@@ -167,7 +167,7 @@ mod tests {
     #[test]
     fn player_receives_dealt_cards() {
         let mut player = Player::new("Nic");
-        assert!(player.cards.is_empty());
+        assert!(player.cards.0.is_empty());
 
         let expected_card = Card {
             rank: Rank::King,
@@ -175,6 +175,30 @@ mod tests {
         };
         player.receive_card(expected_card);
 
-        assert!(player.cards.contains(&expected_card))
+        assert!(player.cards.0.contains(&expected_card))
+    }
+
+    #[test]
+    fn pretty_print_cards_vector_one_item() {
+        let cards = Cards(vec![Card {
+            rank: Rank::Two,
+            suit: Suit::Heart,
+        }]);
+        assert_eq!("2❤", format!("{}", cards))
+    }
+
+    #[test]
+    fn pretty_print_cards_vector_multiple_items() {
+        let cards = Cards(vec![
+            Card {
+                rank: Rank::Two,
+                suit: Suit::Heart,
+            },
+            Card {
+                rank: Rank::Three,
+                suit: Suit::Club,
+            },
+        ]);
+        assert_eq!("2❤, 3♣", format!("{}", cards))
     }
 }
