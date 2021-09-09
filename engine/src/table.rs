@@ -64,6 +64,10 @@ impl<'a> Player<'a> {
     pub(crate) fn receive_card(&mut self, card: Card) {
         self.cards.push(card);
     }
+
+    pub fn get_num_cards(&self) -> usize {
+        self.cards.len()
+    }
 }
 
 impl<'a, 'b> Display for Player<'a> {

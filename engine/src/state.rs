@@ -16,7 +16,7 @@ use crate::cards::Deck;
 use crate::state::Errors::NotEnoughCardsToDeal;
 use crate::table::Player;
 
-const CARDS_PER_PLAYER: u32 = 2;
+const CARDS_PER_PLAYER: usize = 2;
 
 struct TexasHoldemHand<'a, 'b, S: State> {
     deck: Deck,
@@ -102,6 +102,7 @@ pub enum Errors {
 mod tests {
     use crate::state::{Shuffled, Start, TexasHoldemHand, CARDS_PER_PLAYER};
     use crate::table::Player;
+    use std::ops::DerefMut;
 
     #[test]
     fn initial_typestate_only_allows_one_shuffle() {
@@ -110,5 +111,16 @@ mod tests {
         let mut hand = TexasHoldemHand::new(&mut []).shuffle();
         let hand = hand.deal_to_players().unwrap();
         //not a great test, but need to check into testing type IDs
+    }
+
+    #[test]
+    fn create_game_and_deal_to_players() {
+        let mut players = vec![Player::new("Player1"), Player::new("Player2")];
+
+        let mut hand = TexasHoldemHand::new(players.deref_mut());
+        let mut hand = hand.shuffle();
+        let mut hand = hand.deal_to_players();
+
+        players.iter().for_each(|p| assert_eq!(p.get_num_cards(), CARDS_PER_PLAYER))
     }
 }
